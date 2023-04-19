@@ -1,4 +1,4 @@
-(https://github.com/legitbox/BDSX-Manager-plus/blob/master/BDSXmL.png?raw=true)
+![](https://github.com/legitbox/BDSX-Manager-plus/blob/master/BDSXmL.png?raw=true)
 # BDSX-Manager
 WARNING!!! THIS IS A FORK OF BDSX-Manager-plus
 
