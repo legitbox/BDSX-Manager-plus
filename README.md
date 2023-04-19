@@ -1,4 +1,4 @@
-(https://cdn.discordapp.com/attachments/1031413188421500979/1098301861485871114/grogfdgndfgnvfbdndfgnhArtboard_1.png)
+(https://github.com/legitbox/BDSX-Manager-plus/blob/master/BDSXmL.png?raw=true)
 # BDSX-Manager
 WARNING!!! THIS IS A FORK OF BDSX-Manager-plus
 
