@@ -14,8 +14,4 @@ Still working on it
 
 Bdsx Github: https://github.com/bdsx/bdsx
 
-# Other
-
-In the future I want to add other feature such as auto backup and chat management feature. If you have any suggestions or bugs/problems please open an issue.
-
 
