@@ -5,7 +5,12 @@ import re
 import time
 import os
 import configparser
+import psutil
+import threading
+import ctypes
 
+cpu_usage = psutil.cpu_percent(interval=1)
+ram_usage = psutil.virtual_memory().percent
 # get the directory path of the current script
 dir_path = os.path.dirname(__file__)
 
@@ -47,7 +52,6 @@ player_count = 0
 restart_interval = config['SERVER'].get('RestartInterval', '6 hr')
 
 stop_flag = False  # global flag variable to signal the loop to stop
-
 def run_bat_file_restart():
     global stop_flag
     remaining_time = int(restart_interval) * 3600
@@ -297,10 +301,9 @@ def kick_player():
         print(command)
         process.stdin.write(command + "\n")
         process.stdin.flush()
-# create the GUI layout
 
 
-
+sg.theme('DarkAmber')
 operations_column = [
     [sg.Text("Server Status:", pad=(0,0)), sg.Text("Stopped", key="-SERVER_STATE-")],
     [sg.Button('Start', button_color="green", size = (10,0)), 
@@ -309,6 +312,8 @@ operations_column = [
     [sg.Button('Index.ts', size = (16,0)), sg.Button('Server.properties', size = (16,0))], 
     [sg.Button('BDSX Folder', size = (16,0)), sg.Button(' ', size = (16,0))], 
     [sg.Text('—'*22, pad = (0,0), justification = "center")],
+    [sg.Text("")],
+
     
     [sg.Text("Auto Restart System:"), sg.Checkbox("Enabled", enable_events=True, key="-RESTART_ENABLED-")],
     [sg.Text("Next Restart:"), sg.Text("- -", key="-COUNTDOWN-")],
@@ -320,11 +325,12 @@ operations_column = [
     
     [sg.Text('—'*22, pad = (0,0), justification = "center")],
     [sg.Text("Online Players:"), sg.Text("0", key=("-ONLINE_PLAYERS-"))],
-    [sg.Listbox(values=player_list, size=(50, 8), key='player_list')],
+    [sg.Listbox(values=player_list, size=(50, 5), key='player_list')],
     [sg.Button('OP', size = (10,0)), 
      sg.Button('DEOP', size = (10,0)), 
      sg.Button('Kick', size = (10,0))],
-    [sg.Button("Test", key=("-TEST-"), visible=False)],
+    [sg.Text("CPU Usage: -", key="-CPU_USAGE-", text_color="#FFB6C1"),sg.Text("RAM Usage: -", key="-RAM_USAGE-", text_color="#90EE90")],
+    [sg.Text("0", key=("-TOTAL_CPU_USAGE-"))],
     ]
     
 output_column = [
@@ -340,10 +346,37 @@ layout = [
     ]
 
 
-#sg.theme('DefaultNoMoreNagging')
+sg.theme('DarkAmber')
+window = sg.Window('BDSX Manager', layout, size = (1200,700), finalize=True)
 
-window = sg.Window('BDSX Manager', layout, size = (1200,600), finalize=True)
 
+window.set_icon("bdsxm.ico")
+def update_cpu_ram_meters(window):
+    while True:
+        cpu_percent = psutil.cpu_percent(percpu=True, interval=0.5)
+        ram_usage = psutil.virtual_memory().percent
+
+        # Create a list of CPU usage strings for each core
+        core_usage_text = [f"Core {i}: {core_percent:.1f}%" for i, core_percent in enumerate(cpu_percent)]
+
+        # Join the list of CPU usage strings with a newline character
+        core_usage_text = "\n".join(core_usage_text)
+
+        # Calculate the total CPU usage
+        total_cpu_percent = sum(cpu_percent)
+        total_cpu_count = psutil.cpu_count()
+        total_cpu_usage = min(total_cpu_percent / total_cpu_count, 100)  # Cap at 100%
+        total_usage_text = f"Total CPU Usage: {total_cpu_usage:.1f}%"
+
+        # Update the GUI elements
+        window['-CPU_USAGE-'].update(core_usage_text)
+        window['-RAM_USAGE-'].update(f"RAM Usage: {ram_usage:.1f}%")
+        window['-TOTAL_CPU_USAGE-'].update(total_usage_text)
+        
+
+t = threading.Thread(target=update_cpu_ram_meters, args=(window,))
+t.daemon = True
+t.start()
 restart_interval = config['SERVER'].get('RestartInterval', '6 hr')
 if restart_interval == '1':
     window['-1'].update(value=True)
@@ -355,8 +388,8 @@ elif restart_interval == '12':
     window['-12'].update(value=True)
 
 restart_enabled = config['SERVER'].getboolean('Restartenabled')
-window['-RESTART_ENABLED-'].update(value=restart_enabled)
 
+window['-RESTART_ENABLED-'].update(value=restart_enabled)
 
 while True:
     # read the window's events
@@ -460,7 +493,18 @@ while True:
             break
         else:
             break
+# ram meter crap
+while True:
+    event, values = window.read(timeout=1000)
+    if event == sg.WIN_CLOSED:
+        break
+    # Update CPU usage progress bar
+    cpu_usage = psutil.cpu_percent(interval=1)
+    window['-CPU_USAGE-'].update_bar(cpu_usage)
 
+    # Update RAM usage progress bar
+    ram_usage = psutil.virtual_memory().percent
+    window['-RAM_USAGE-'].update_bar(ram_usage)
 # close the window
 window.close()
 
