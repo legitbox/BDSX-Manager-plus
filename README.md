@@ -5,8 +5,11 @@
 
  WARNING!!! THIS IS A FORK OF BDSX-Manager
  
- # crap to do
+ # to fix
+  - program crashes when opening a file that doesnt exist
   - UI jittering while using the console
+ 
+ # crap to do
   - rework the joined players detection system
   - cpu usage calculation rework
   - automatic backup integration
