@@ -8,6 +8,7 @@
  # to fix
   - program crashes when opening a file that doesnt exist
   - UI jittering while using the console
+  - error when running a command, when the server is offline
  
  # crap to do
   - rework the joined players detection system
@@ -16,6 +17,7 @@
   - log saving
   - log analysis
   - performance analysis
+  - improve performance using PyPy compiler
 
 
 BDSX-Manager-plus is a Python-based GUI wrapper for managing a BDSX Server. It has basic features such as Start, Stop, Restart, CPU and RAM usage meters, Auto-restart, and console output with commands. It also has shortcuts to various files inside the bdsx directory. You can see a player list with options to OP, DeOP, or Kick players.
